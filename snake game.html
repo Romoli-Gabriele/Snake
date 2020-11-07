@@ -1,0 +1,160 @@
+﻿<canvas id="tela" width="1000" height="600"> </canvas>
+
+<script>
+grafica=document.getElementById("tela").getContext("2d");
+x=400;
+y=400;
+tasto = 37;
+speed=4;
+audio = new Audio("Blocked.wav");
+rallenty = false;
+xold = []; //lista per le vecchie coordinate x da cui è passato il serpente
+yold = [];
+pos = 0;  // posizione attualmente in uso nella lista.
+punteggio = 0;
+coda = 10 + punteggio;
+xwin=Math.random()*900;
+ywin=Math.random()*500; 
+grafica.fillStyle = "red";
+grafica.fillRect(xwin,ywin,10,10);
+
+audio2 = new Audio("Error.wav");
+
+
+function animazione() {
+	sposta();
+	correggiXY();
+	controlloautoscontri();
+	aggiorna();	
+	disegna();
+	controllovittoria();
+	requestAnimationFrame(animazione);
+}
+
+function sposta(){
+	var vel;
+	if( rallenty == false ) {
+		vel = speed;
+	} else{
+		vel = speed-2;
+	}
+
+	if(tasto==37) {
+	x -= vel;
+	}
+	if(tasto==38) {
+	y -= vel;
+	}
+	if(tasto==39) {
+	x += vel;
+	}
+	if(tasto==40) {
+	y += vel;
+	}
+	if(tasto==65) {
+	x-=vel;
+	y-=vel;
+	}
+if(tasto==90) {
+	x-=vel;
+	y+=vel;
+	}
+if(tasto==88) {
+	x+=vel;
+	y+=vel;
+	}
+if(tasto==83) {
+	x+=vel;
+	y-=vel;
+	}
+	//  diagonali fatte
+}
+
+function correggiXY() {
+	if (x>1000) {
+	animazione = 0;
+			alert("Game Over Punteggio "+ punteggio);
+	}
+	if (x<0) {
+animazione = 0;
+			alert("Game Over Punteggio "+ punteggio);
+	
+	}
+	if (y>600) {
+	animazione = 0;
+			alert("Game Over Punteggio "+ punteggio);
+	
+	}
+	if (y<0) {
+	animazione = 0;
+			alert("Game Over Punteggio "+ punteggio);
+	}
+}
+
+function aggiorna() {
+	grafica.clearRect(xold[pos],yold[pos],10,10);
+	xold[pos-1] = x;
+	yold[pos-1] = y;
+	pos =   (pos+1)%coda;	
+}
+
+function controlloautoscontri() {
+	for(i=0; i<coda; i++   ) {
+		if( x==xold[i] && y==yold[i] ) {
+			audio.play();
+			animazione = 0;
+			alert("Game Over Punteggio "+  punteggio);
+		}
+	}
+}
+
+function controllovittoria() {
+	if( x>xwin-5 && y>ywin-5 && x<xwin+10 && y<ywin+10 ) {
+		punteggio += 1;
+		alert("punteggio " + punteggio);
+		xwin=Math.random()*1000;
+		ywin=Math.random()*600; 
+		grafica.fillStyle = "red";
+		grafica.fillRect(xwin,ywin,10,10);
+		coda=coda+10;
+	}
+}
+
+
+function disegna() {
+	grafica.lineWidth = 2;
+	grafica.strokeStyle = "green";
+
+	grafica.shadowColor = "blue";
+	grafica.strokeRect(x,y,10,10);
+}
+
+function tastopremuto(evento) {
+	var key = evento.keyCode;
+	
+	if(key == 49) {
+		rallenty = true;
+	} else {
+		tasto = key;
+	}
+	
+	//alert("E' astato premuto il tasto "+ "<br>" + tasto);
+}
+
+function tastorilasciato(evento) {
+	var key = evento.keyCode;
+	
+	if(key == 49) {
+		rallenty = false;
+	} 
+}
+
+addEventListener("keydown", tastopremuto);
+addEventListener("keyup", tastorilasciato);
+
+grafica.strokeStyle = "red";
+grafica.lineWidth = 8;
+grafica.strokeRect(0,0, 1000,600);
+
+animazione();
+</script>
